@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>replit</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <script src="https://kit.fontawesome.com/4b0d1539a5.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+</head>
+
+<body>
+  <script src="//cdn.jsdelivr.net/npm/phaser@3.80.0/dist/phaser.js"></script>
+  <script src="game_folder/buildings/building.js"></script>
+  <script src="game_folder/buildings/civilian.js"></script>
+  <script src="game_folder/buildings/industry.js"></script>
+  <script src="game_folder/buildings/military.js"></script>
+  <script src="game_folder/classes/Person.js"></script>
+  <script src="game_folder/classes/classes.js"></script>
+  <script src="game_folder/buildings/resources.js"></script>
+  <script src="game_folder/game.js"></script>
+  <script src="game_folder/scene.js"></script>
+  <div id='gameContainer'></div>
+</body>
+
+</html>
+
+<!-- todo list _big_
+- game over screen
+- - stats
+- warning popups
+- - tween slide popups around screen
+- construction
+- - animation
+- - assign workers to construction
+- resource buildings
+- - implement woodcutter hut efficiency
+- - tree cut stage
+- - tree planting
+- - create quarry image
+- - implement quarry efficiency
+- - create mine image
+- - create iron resource image
+- - implement mine efficiency
+- soliders
+- - create soldier sprites
+- - sprite animations
+- - movement
+- - pathfinding
+- - interation with buildings
+- - interation with other soldiers
+- - spawning
+- - healthbars
+- civilian that walk around and do tasks
+- - create civilain sprite
+- - create civilian animations
+
+-->
+<!-- todo list _small_
+- fix building preview to use placement code
+- get rid of flipped images and just flip them in the code
+- wall click and drag
+- add more interactive ui
+- - resource depleted popup
+- - no workers popup
+- - no food popup
+- - popup for building info in catalog (show cost, workers needed, desc, etc)
+- - numbers to show how much buildings are - make look better
+- - modify plus one for multiple resources
+- - create healthbar popups
+- - resource icon popup for lack of resource
+- ui rework
+- - season wheel
+- - topdown minimap
+- - final touches
+- food production and storage
+- - create granary tile
+- - implement granary tile
+- fix tilemap render artifacts
+- - pixel perfect function maybe
+- enemy attacks
+- - wave spawning
+- - warnings
+- mobile friendly
+- - change placement code to work better with touch events
+
+-->
+<!-- issues
+- farms release their workers but also duplicate them maybe
+- glyph bbox doesnt work for a few seconds when first farm is placed
+- keep doesnt line up for some reason. might be keep dims
+- images in catalog get streched and look blurry
+- most buildings do not line up with 16x16 tiles
+- - farm is pixel too high
+- 
+
+-->
+
+<!-- credit
+- character sprites
+- - https://www.pinterest.com/pin/725783296187456320/
+
+-->
