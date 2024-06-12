@@ -27,7 +27,7 @@
 </html>
 
 <!-- todo list _big_
-- game over screen 
+- game over screen
 - - stats
 - warning popups
 - - tween slide popups around screen
@@ -58,7 +58,6 @@
 
 -->
 <!-- todo list _small_
-- fix building preview to use placement code
 - get rid of flipped images and just flip them in the code
 - wall click and drag
 - add more interactive ui
@@ -87,6 +86,12 @@
 
 -->
 <!-- issues
+- buildings placed off the map still subtract resources
+- - woodcutters hut tries to place points when placed off the map and runs into errors
+- wall placement code uses +8px offset instead of logic
+- - wall preview doesnt and is incorrect
+- - wall collision is still determined by the tile that the preview is on
+- food popup has a child undefined error
 - farms release their workers but also duplicate them maybe
 - glyph bbox doesnt work for a few seconds when first farm is placed
 - keep doesnt line up for some reason. might be keep dims

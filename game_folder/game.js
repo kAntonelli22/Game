@@ -69,6 +69,11 @@ class Game extends Phaser.Scene {
     this.debugCursorRect = this.add.rectangle(0, 0, 64, 16, 0xff00ff).setOrigin(0).setDepth(100);
     this.debugCursorText = this.add.text(0, 0, 'x: 0, y: 0', {font: '10px Arial', fill: '#fff'}).setDepth(100);
 
+    // debug tiles tinted by update preview to show where top bottom and center of preview are
+    this.debugPreviewStartTile;
+    this.debugPreviewStartTile;
+    this.debugPreviewStartTile;
+
     // tiles tinted by update preview
     this.tintedTile;
     this.tintedBuilding;
@@ -115,10 +120,16 @@ class Game extends Phaser.Scene {
       tower: {w: 36, h: 89, bx: 32, by: 17},
       keep: {w: 64, h: 83, bx: 64, by: 33},
     };
+    // dimensions of the building that the building preview image is currently displaying
     this.previewDim = this.buildDim.keep;
+    console.log('this.previewDim: ', this.previewDim)
     
 
     this.buildingPreview = this.add.image(0, 0, 'keep',).setVisible(false).setAlpha(.5).setDepth(100);
+
+
+    // debug tile tint
+    this.debugTiles;
 
     // variables and bools
     //
@@ -180,6 +191,19 @@ class Game extends Phaser.Scene {
       if (this.debugMode) {
         this.debugCursorRect.setPosition(x, y);
         this.debugCursorText.setPosition(x, y);
+        // phaser does not like this code at all
+        // if (this.debugTiles) {
+        //   console.log('debug tiles in moveevent if')
+        //   this.debugTiles.forEach(tile => {tile.tint = 0xffffff});
+        //   let last
+        //   [this.debugTiles, last] = this.getPreviewTiles(this.previewDim.w, this.previewDim.h, this.previewDim.bx, this.previewDim.by);
+        //   this.debugTiles.forEach(tile => {tile.tint = 0x0ff00f});
+        // } else {
+        //   console.log('debug tiles in moveevent else')
+        //   let last
+        //   [this.debugTiles, last] = this.getPreviewTiles(this.previewDim.w, this.previewDim.h, this.previewDim.bx, this.previewDim.by);
+        //   this.debugTiles.forEach(tile => {tile.tint = 0x0ff00f});
+        // }
         let tile = this.layer1.getIsoTileAtWorldXY(x, y, false);
         this.debugCursorText.text = 'x: ' + Math.floor(x) + ', y: ' + Math.floor(y)
         if (tile) {
@@ -247,7 +271,9 @@ class Game extends Phaser.Scene {
     // this.people.preUpdate(time, delta);
 
     // checks if game is over
-    if (this.population <= 0 && this.keepPlaced || this.keepDestroyed) {
+    if (this.population <= 0 && this.keepPlaced) {
+      this.endGame('people');
+    } else if (this.keepDestroyed) {
       this.endGame('people');
     }
   }
@@ -337,7 +363,7 @@ class Game extends Phaser.Scene {
         // checks for resources
         if (this.stone >= 50) {
           this.stone -= 50;
-          newBuilding = new Wall(this, lastTile.x, lastTile.y - (dims.h / 2), dims.w, dims.h, direction, previewTiles);
+          newBuilding = new Wall(this, lastTile.x, lastTile.y - (dims.h / 2) + 8, dims.w, dims.h, direction, previewTiles);
           this.adjustDepth(newBuilding);
         } else {console.log('not enough resources'); this.cantPlace();}
         
@@ -359,7 +385,7 @@ class Game extends Phaser.Scene {
         [previewTiles, lastTile] = this.getPreviewTiles(x, y, dims);
         // checks if the keep has been placed yet
         if (!this.keepPlaced) {
-          newBuilding = new Keep(this, lastTile.x, lastTile.y - (dims.h / 2) - 1, dims.w, dims.h, direction, previewTiles); // idk why this needs to be offset
+          newBuilding = new Keep(this, lastTile.x, lastTile.y - (dims.h / 2), dims.w, dims.h, direction, previewTiles); // idk why this needs to be offset
           this.adjustDepth(newBuilding);
           
           
@@ -399,20 +425,23 @@ class Game extends Phaser.Scene {
     // x and y snapped to the tilemap. is offset to the top left by 32
     const snappedCords = this.layer1.worldToTileXY(x, y, true);
     const snappedWorldCords = this.layer1.tileToWorldXY(snappedCords.x, snappedCords.y);
-    // currentTile the pointer is over
+    // currentTile the pointer is over. used for delete
     let currentBuilding;
     let currentTile;
     let tileCenter;
-    
 
-    if (this.tintedTile) {this.tintedTile.tint = 0xffffff; this.tintedTile = null}
-    if (this.tintedBuilding) {this.tintedBuilding.image.clearTint(); this.tintedBuilding = null}
+    // get the tiles that are taken up by the previews base
+    let previewTiles;
+    let lastTile;
 
     // assigns the tile the pointer is over to currentTile if it exists
     if (this.layer1.getIsoTileAtWorldXY(x, y + 8, false)) {
       currentTile = this.layer1.getIsoTileAtWorldXY(x, y + 8, false);
       tileCenter = {x: currentTile.pixelX + 9, y: currentTile.pixelY + 4}
     } else {currentTile = null}
+
+    if (this.tintedTile) {this.tintedTile.tint = 0xffffff; this.tintedTile = null}
+    if (this.tintedBuilding) {this.tintedBuilding.image.clearTint(); this.tintedBuilding = null}
 
     this.buildings.getChildren().forEach(building => {
       if (building.getBounds().contains(x, y)) {
@@ -429,43 +458,44 @@ class Game extends Phaser.Scene {
     switch (this.building) {
       case 'house':
         this.buildingPreview.setTexture(`house${this.direction}`);
-        this.previewDim = this.buildDim.house
-        if (this.debugMode) {this.debugPreviewOutline(x, y, 34, 17);}
+        this.previewDim = this.buildDim.house; // must have a semicolon here or it will combine both lines
+        // [previewTiles, lastTile] = this.getPreviewTiles(x, y, this.previewDim);
+        if (this.debugMode) {this.debugPreviewOutline(x, y, this.previewDim.bx, this.previewDim.by);}
         break;
       case 'farm':
         this.buildingPreview.setTexture('farm0');
-        this.previewDim = this.buildDim.farm
-        if (this.debugMode) {this.debugPreviewOutline(x, y, 64, 33);}
+        this.previewDim = this.buildDim.farm;
+        if (this.debugMode) {this.debugPreviewOutline(x, y, this.previewDim.bx, this.previewDim.by);}
         break;
       case 'woodcutter':
         this.buildingPreview.setTexture(`woodcutter${this.direction}`);
-        this.previewDim = this.buildDim.woodcutter
-        if (this.debugMode) {this.debugPreviewOutline(x, y, 34, 17);}
+        this.previewDim = this.buildDim.woodcutter;
+        if (this.debugMode) {this.debugPreviewOutline(x, y, this.previewDim.bx, this.previewDim.by);}
         break;
       case 'quarry':
         this.buildingPreview.setTexture(`quarry${this.direction}`);
-        this.previewDim = this.buildDim.quarry
-        if (this.debugMode) {this.debugPreviewOutline(x, y, 34, 17);}
+        this.previewDim = this.buildDim.quarry;
+        if (this.debugMode) {this.debugPreviewOutline(x, y, this.previewDim.bx, this.previewDim.by);}
         break;
       case 'mine':
         this.buildingPreview.setTexture(`mine${this.direction}`);
-        this.previewDim = this.buildDim.mine
-        if (this.debugMode) {this.debugPreviewOutline(x, y, 34, 17);}
+        this.previewDim = this.buildDim.mine;
+        if (this.debugMode) {this.debugPreviewOutline(x, y, this.previewDim.bx, this.previewDim.by);}
         break;
       case 'wall':
         this.buildingPreview.setTexture('wall');
-        this.previewDim = this.buildDim.wall
-        if (this.debugMode) {this.debugPreviewOutline(x, y, 16, 8);}
+        this.previewDim = this.buildDim.wall;
+        if (this.debugMode) {this.debugPreviewOutline(x, y, this.previewDim.bx, this.previewDim.by);}
         break;
       case 'tower':
         this.buildingPreview.setTexture('tower');
-        this.previewDim = this.buildDim.tower
-        if (this.debugMode) {this.debugPreviewOutline(x, y, 32, 17);}
+        this.previewDim = this.buildDim.tower;
+        if (this.debugMode) {this.debugPreviewOutline(x, y, this.previewDim.bx, this.previewDim.by);}
         break;
       case 'keep': 
         this.buildingPreview.setTexture('keep');
-        this.previewDim = this.buildDim.keep
-        if (this.debugMode) {this.debugPreviewOutline(x, y, 64, 33);}
+        this.previewDim = this.buildDim.keep;
+        if (this.debugMode) {this.debugPreviewOutline(x, y, this.previewDim.bx, this.previewDim.by);}
         break;
       case 'delete':
         if (currentTile && !currentBuilding) {
@@ -481,11 +511,12 @@ class Game extends Phaser.Scene {
     } // end of building switch
     // sets the position snapped to the tile or on the pointer
     if (this.buildingPreview._visible) {
-      // previewTiles = this.getTiles()
       this.buildingPreview.setPosition(x, y);
+      [previewTiles, lastTile] = this.getPreviewTiles(x, y, this.previewDim);
       
-      if (currentTile) {
-        this.buildingPreview.setPosition(tileCenter.x, tileCenter.y - (this.buildingPreview.height / 2) + 4);
+      if (lastTile.x && lastTile.y) {
+        console.log('s')
+        this.buildingPreview.setPosition(lastTile.x, lastTile.y - (this.previewDim.h / 2));
       }
     }
   } // updatePreview end
@@ -500,18 +531,24 @@ class Game extends Phaser.Scene {
     });
   }
 
+  // gets the tiles that the building will occupy and the lowest tile and returns it in an array. used in the placeBuidling function
   getPreviewTiles (x, y, dimensions) {
-    // manually fix the wall placement
+    console.log('getPreviewTiles', 'x: ', x, '\ny: ', y, '\ndimensions: ', dimensions)
     let tiles = this.getTiles(x, y, dimensions.bx, dimensions.by);
-    let lastTile = {x: tiles[tiles.length - 1].pixelX + 9, y: tiles[tiles.length - 1].pixelY + 8};
-    if (dimensions = this.buildDim.wall) {
-      console.log('adsasss')
-      let tiles = this.getTiles(x - 1, y - 1, dimensions.bx, dimensions.by)
+    // define last tile if the mouse is fully on the map, make null if not
+    let lastTile = tiles[tiles.length - 1] ? {x: tiles[tiles.length - 1].pixelX + 9, y: tiles[tiles.length - 1].pixelY + 8} : {x: null, y: null};
+    // let lastTile = {x: tiles[tiles.length - 1].pixelX + 9, y: tiles[tiles.length - 1].pixelY + 8};
+    // manually fix the wall placement -- places the blue tile tint in the correct place but the wall image is still wrong
+    if (dimensions == this.buildDim.wall) {
+      console.log('correcting wall placement')
+      tiles = this.getTiles(x, y + 8, dimensions.bx, dimensions.by)
     }
     return [tiles, lastTile];
   }
 
+  // gets the tiles that the building will cover
   getTiles(x, y, baseX, baseY) {
+    // console.log('getTiles', 'x: ', x, '\ny: ', y, '\nbaseX: ', baseX, '\nbaseY: ', baseY);
     let baseXTile = Math.floor(baseX / 16);
     let baseYTile = Math.floor(baseY / 8);
     let centerTile = this.layer1.worldToTileXY(x, y, true);
@@ -519,15 +556,27 @@ class Game extends Phaser.Scene {
     
     let tiles = this.layer1.getTilesWithin(startTile.x, startTile.y, baseXTile, baseYTile);
 
+    // changes the color of start, center, and end tiles when in debug mode
     if (this.debugMode) {
-      this.layer1.getTileAt(startTile.x, startTile.y).tint = 0x00ffff;
-      this.layer1.getTileAt(centerTile.x, centerTile.y).tint = 0xffff00;
-      this.layer1.getTileAt(tiles[tiles.length - 1].x, tiles[tiles.length - 1].y).tint = 0xff00ff;
+      if (this.debugPreviewStartTile && this.debugPreviewStartTile && this.debugPreviewStartTile) {
+        this.debugPreviewStartTile.tint = 0xffffff;
+        this.debugPreviewStartTile.tint = 0xffffff;
+        this.debugPreviewStartTile.tint = 0xffffff;
+      }
+      if (tiles[tiles.length - 1]) {
+        this.debugPreviewStartTile = this.layer1.getTileAt(startTile.x, startTile.y);
+        this.debugPreviewCenterTile = this.layer1.getTileAt(centerTile.x, centerTile.y);
+        this.debugPreviewEndTile = this.layer1.getTileAt(tiles[tiles.length - 1].x, tiles[tiles.length - 1].y);
+        this.debugPreviewStartTile.tint = 0x00ffff;
+        this.debugPreviewStartTile.tint = 0xffff00;
+        this.debugPreviewStartTile.tint = 0xff00ff;
+      }
     }
     
     return tiles;
   }
 
+  // checks if a resource building is being placed on a tile with that resource
   checkResource(tiles, index) {
     let onResource = true;
     tiles.forEach(tile => {
@@ -536,22 +585,24 @@ class Game extends Phaser.Scene {
     return onResource;
   }
 
+  // called when a building is being placed to see if it overlaps with anything
   checkOverlap(arr1, arr2) {
     let overlapping = false;
-    // checks if building overlaps with other buildings
+    // checks for other buildings
     arr1.forEach(building => {
       if (building.tiles.some(tile => arr2.includes(tile))) {
         console.log('building overlaps');
         overlapping = true;
       }
     })
-    // checks if buildings overlaps with water
+    // checks for water
     arr2.forEach(tile => {
       if (tile.index == 6) {overlapping = true}
     })
     return overlapping;
   }
 
+  // creates a line that shows where the building should be placed. does not snap to grid
   debugPreviewOutline(x, y, width, height) {
 
     this.clearGraphics();
@@ -565,7 +616,6 @@ class Game extends Phaser.Scene {
     let topY = y - height / 2;
     let bottomY = y + height / 2;
 
-    // Visualize the diamond
     let diamond = this.add.graphics();
     diamond.lineStyle(2, 0x0000ff, 1);
     diamond.beginPath();
@@ -577,6 +627,7 @@ class Game extends Phaser.Scene {
     diamond.stroke();
   }
 
+  // clears the debug building outline
   clearGraphics() {
       this.children.each(child => {
           if (child instanceof Phaser.GameObjects.Graphics) {
@@ -586,6 +637,7 @@ class Game extends Phaser.Scene {
       });
   };
 
+  // stops the hud and switches to the end game scene
   endGame(cause) {
     this.buildings.getChildren().forEach(building => {
       // building.delete();
