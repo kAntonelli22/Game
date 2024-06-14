@@ -20,17 +20,24 @@ class House extends Building {
     this.residents = [];
     this.foodStores = 0;
 
-    this.image.setTexture(`house${this.direction}`)// = this.gameScene.add.image(0, 0, `house${this.direction}`)
+    this.image.setTexture(`house${this.direction}`).setTint(0x00ff00);
 
     this.add(this.image)
     this.scene.add.existing(this);
     scene.houses.push(this);
+    console.log(this)
 
     this.gameScene.ui.popupHandler.plusOne('wood', '-50', this.x, this.y);
   }
   update(time, delta) {
-    // if (this.foodStores < 8) {this.getFood();}
+    if (!this.underConstruction) {
+      // if (this.foodStores < 8) {this.getFood();}
     if (this.residents.length < 4) {this.getResident();}
+    } // code inside doesnt run when the building is being constructed
+  }
+  finishConstruction() {
+    this.image.setTexture(`house${this.direction}`).setTint(0xffffff);
+    this.underConstruction = false;
   }
   // getFood() {
   //   this.gameScene.food--;

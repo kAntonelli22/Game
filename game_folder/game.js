@@ -515,7 +515,6 @@ class Game extends Phaser.Scene {
       [previewTiles, lastTile] = this.getPreviewTiles(x, y, this.previewDim);
       
       if (lastTile.x && lastTile.y) {
-        console.log('s')
         this.buildingPreview.setPosition(lastTile.x, lastTile.y - (this.previewDim.h / 2));
       }
     }
@@ -533,7 +532,7 @@ class Game extends Phaser.Scene {
 
   // gets the tiles that the building will occupy and the lowest tile and returns it in an array. used in the placeBuidling function
   getPreviewTiles (x, y, dimensions) {
-    console.log('getPreviewTiles', 'x: ', x, '\ny: ', y, '\ndimensions: ', dimensions)
+    // console.log('getPreviewTiles', 'x: ', x, '\ny: ', y, '\ndimensions: ', dimensions)
     let tiles = this.getTiles(x, y, dimensions.bx, dimensions.by);
     // define last tile if the mouse is fully on the map, make null if not
     let lastTile = tiles[tiles.length - 1] ? {x: tiles[tiles.length - 1].pixelX + 9, y: tiles[tiles.length - 1].pixelY + 8} : {x: null, y: null};

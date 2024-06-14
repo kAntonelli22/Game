@@ -22,7 +22,7 @@ class Keep extends Building {
     this.gameScene.gold += 100;
     this.gameScene.food += 50;
     
-    this.image.setTexture('keep')
+    this.image.setTexture('keep').setTint(0x00ff00);
     this.add(this.image);
     this.scene.add.existing(this);
 
@@ -39,7 +39,13 @@ class Keep extends Building {
     })
   }
   update(time, delta) {
-
+    if (!this.underConstruction) {
+      
+    } // code inside doesnt run when the building is being constructed
+  }
+  finishConstruction() {
+    this.image.setTexture('keep').setTint(0xffffff);
+    this.underConstruction = false;
   }
   food() {
     this.gameScene.food -= Math.round(this.gameScene.population / 4);
@@ -78,7 +84,7 @@ class Tower extends Building {
       this.tiles.forEach(tile => {if (tile.tint = 0xffffff) {tile.tint = 0x0000ff}})
     }
 
-    this.image.setTexture('tower')
+    this.image.setTexture('tower').setTint(0x00ff00)
     this.add(this.image);
 
     this.workers = [];
@@ -93,7 +99,13 @@ class Tower extends Building {
     }
   }
   update(time, delta) {
-
+    if (!this.underConstruction) {
+      
+    } // code inside doesnt run when the building is being constructed
+  }
+  finishConstruction() {
+    this.image.setTexture('tower').setTint(0xffffff);
+    this.underConstruction = false;
   }
   delete() {
     console.log('delete tower')
@@ -124,7 +136,7 @@ class Wall extends Building {
       this.tiles.forEach(tile => {if (tile.tint = 0xffffff) {tile.tint = 0x0000ff}})
     }
 
-    this.image.setTexture('wall')
+    this.image.setTexture('wall').setTint(0x00ff00);
     this.add(this.image);
 
     scene.walls.push(this);
@@ -132,7 +144,13 @@ class Wall extends Building {
 
   }
   update(time, delta) {
+    if (!this.underConstruction) {
 
+    } // code inside doesnt run when the building is being constructed
+  }
+  finishConstruction() {
+    this.image.setTexture('wall').setTint(0xffffff);
+    this.underConstruction = false;
   }
   delete() {
     console.log('delete wall')

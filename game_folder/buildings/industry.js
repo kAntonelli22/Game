@@ -15,7 +15,7 @@ class Bridge extends Building {
       this.tiles.forEach(tile => {if (tile.tint = 0xffffff) {tile.tint = 0x0000ff}})
     }
 
-    this.image.setTexture(`bridge${this.direction}`)
+    this.image.setTexture(`bridge${this.direction}`).setTint(0x00ff00);
 
     this.add(this.image);
     this.scene.add.existing(this);
@@ -24,7 +24,13 @@ class Bridge extends Building {
     this.gameScene.ui.popupHandler.plusOne('\ue2cd', '-5', this.x, this.y);
   }
   update(time, delta) {
-
+    if (!this.underConstruction) {
+      
+    } // code inside doesnt run when the building is being constructed
+  }
+  finishConstruction() {
+    this.image.setTexture(`bridge${this.direction}`).setTint(0xffffff);
+    this.underConstruction = false;
   }
 }
 
@@ -49,7 +55,7 @@ class Farm extends Building {
     this.efficiency = 100;
     this.workers = [];
 
-    this.image.setTexture('farm0')
+    this.image.setTexture('farm0').setTint(0x00ff00);
     this.add(this.image)
     this.gameScene.add.existing(this);
     this.gameScene.farms.push(this);
@@ -60,42 +66,47 @@ class Farm extends Building {
     this.growTimer;
   }
   update(time, delta) {
-
-    if (this.growTimer == null) {
-      this.growTimer = this.gameScene.time.addEvent({
-        delay: this.growthTime,
-        callback: this.changeGrowth,
-        args: [this.gameScene, this.growth],
-        callbackScope: this,
-        loop: true,
-      });
-    }
-    // handles the efficiency of the farm based on how many workers
-    switch(this.workers.length) {
-      case 0:
-        this.efficiency = 0;
-        if (!this.growTimer.paused) {this.growTimer.paused = true;}
-        break;
-      case 1:
-        this.efficiency = 25;
-        break;
-      case 2:
-        this.efficiency = 50;
-        break;
-      case 3:
-        this.efficiency = 75;
-        break;
-      case 4:
-        this.efficiency = 100;
-        break;
-    }
-    if (this.growTimer.paused == true && this.efficiency > 0) {this.growTimer.paused = false;}
-    this.growthTime = 250000 / this.efficiency;
-
-    // searches for workers
-    if (this.gameScene.unemployed.length > 0 && this.workers.length < 4) {
-      this.getWorker()
-    }
+    if (!this.underConstruction) {
+      if (this.growTimer == null) {
+        this.growTimer = this.gameScene.time.addEvent({
+          delay: this.growthTime,
+          callback: this.changeGrowth,
+          args: [this.gameScene, this.growth],
+          callbackScope: this,
+          loop: true,
+        });
+      }
+      // handles the efficiency of the farm based on how many workers
+      switch(this.workers.length) {
+        case 0:
+          this.efficiency = 0;
+          if (!this.growTimer.paused) {this.growTimer.paused = true;}
+          break;
+        case 1:
+          this.efficiency = 25;
+          break;
+        case 2:
+          this.efficiency = 50;
+          break;
+        case 3:
+          this.efficiency = 75;
+          break;
+        case 4:
+          this.efficiency = 100;
+          break;
+      }
+      if (this.growTimer.paused == true && this.efficiency > 0) {this.growTimer.paused = false;}
+      this.growthTime = 250000 / this.efficiency;
+  
+      // searches for workers
+      if (this.gameScene.unemployed.length > 0 && this.workers.length < 4) {
+        this.getWorker()
+      }
+    } // code inside doesnt run when the building is being constructed
+  }
+  finishConstruction() {
+    this.image.setTexture('farm0').setTint(0xffffff);
+    this.underConstruction = false;
   }
   changeGrowth(scene, growth) {
     if (this.growth < 2) {
@@ -160,7 +171,7 @@ class Woodcutter extends Building {
       this.tiles.forEach(tile => {if (tile.tint = 0xffffff) {tile.tint = 0x0000ff}})
     }
 
-    this.image.setTexture(`woodcutter${this.direction}`);
+    this.image.setTexture(`woodcutter${this.direction}`).setTint(0x00ff00);
 
     this.add(this.image)
     this.scene.add.existing(this);
@@ -171,32 +182,38 @@ class Woodcutter extends Building {
       this.tickTime = 5000;
     }
     update(time, delta) {
-      if (this.woodcutterTick == null) {
-        this.woodcutterTick = this.gameScene.time.addEvent({
-          delay: this.tickTime,
-          callback: this.findTree,
-          args: [],
-          callbackScope: this,
-          loop: true,
-        });
+      if (!this.underConstruction) {
+        if (this.woodcutterTick == null) {
+          this.woodcutterTick = this.gameScene.time.addEvent({
+            delay: this.tickTime,
+            callback: this.findTree,
+            args: [],
+            callbackScope: this,
+            loop: true,
+          });
+        }
+      // handles the efficiency of the woodcutter based on how many workers
+      switch(this.workers.length) {
+        case 0:
+          this.efficiency = 0;
+          break;
+        case 1:
+          this.efficiency = 50;
+          break;
+        case 2:
+          this.efficiency = 100;
+          break;
       }
-    // handles the efficiency of the woodcutter based on how many workers
-    switch(this.workers.length) {
-      case 0:
-        this.efficiency = 0;
-        break;
-      case 1:
-        this.efficiency = 50;
-        break;
-      case 2:
-        this.efficiency = 100;
-        break;
-    }
-
-    // searches for workers
-    if (this.gameScene.unemployed.length > 0 && this.workers.length < 2) {
-      this.getWorker()
-    }
+  
+      // searches for workers
+      if (this.gameScene.unemployed.length > 0 && this.workers.length < 2) {
+        this.getWorker()
+      }
+      } // code inside doesnt run when the building is being constructed
+  }
+  finishConstruction() {
+    this.image.setTexture(`woodcutter${this.direction}`).setTint(0xffffff);
+    this.underConstruction = false;
   }
   findTree() {
     let trees = []
@@ -247,7 +264,7 @@ class Quarry extends Building {
       this.tiles.forEach(tile => {if (tile.tint = 0xffffff) {tile.tint = 0x0000ff}})
     }
 
-    this.image.setTexture(`quarry${this.direction}`)
+    this.image.setTexture(`quarry${this.direction}`).setTint(0x00ff00);
 
     this.add(this.image)
     this.scene.add.existing(this);
@@ -259,15 +276,21 @@ class Quarry extends Building {
     this.tickTime = 5000;
   }
   update(time, delta) {
-    if (this.quarryTick == null) {
-      this.quarryTick = this.gameScene.time.addEvent({
-        delay: this.tickTime,
-        callback: this.addStone,
-        args: [],
-        callbackScope: this,
-        loop: true,
-      });
-    }
+    if (!this.underConstruction) {
+      if (this.quarryTick == null) {
+        this.quarryTick = this.gameScene.time.addEvent({
+          delay: this.tickTime,
+          callback: this.addStone,
+          args: [],
+          callbackScope: this,
+          loop: true,
+        });
+      }
+    } // code inside doesnt run when the building is being constructed
+  }
+  finishConstruction() {
+    this.image.setTexture(`quarry${this.direction}`).setTint(0xffffff);
+    this.underConstruction = false;
   }
   addStone() {
     this.gameScene.stone += 5;
@@ -292,7 +315,7 @@ class Mine extends Building {
       this.tiles.forEach(tile => {if (tile.tint = 0xffffff) {tile.tint = 0x0000ff}})
     }
 
-    this.image.setTexture(`mine${this.direction}`)
+    this.image.setTexture(`mine${this.direction}`).setTint(0x00ff00);
 
     this.add(this.image)
     this.scene.add.existing(this);
@@ -304,15 +327,21 @@ class Mine extends Building {
       this.tickTime = 7500;
     }
     update(time, delta) {
-      if (this.mineTick == null) {
-        this.mineTick = this.gameScene.time.addEvent({
-          delay: this.tickTime,
-          callback: this.addIron,
-          args: [],
-          callbackScope: this,
-          loop: true,
-        });
-      }
+      if (!this.underConstruction) {
+        if (this.mineTick == null) {
+          this.mineTick = this.gameScene.time.addEvent({
+            delay: this.tickTime,
+            callback: this.addIron,
+            args: [],
+            callbackScope: this,
+            loop: true,
+          });
+        }
+      } // code inside doesnt run when the building is being constructed
+    }
+    finishConstruction() {
+      this.image.setTexture(`mine${this.direction}`).setTint(0xffffff);
+      this.underConstruction = false;
     }
     addIron() {
       this.gameScene.iron += 4;
