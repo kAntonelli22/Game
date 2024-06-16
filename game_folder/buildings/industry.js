@@ -129,6 +129,8 @@ class Farm extends Building {
     this.growTimer.destroy();
     // lays off the workers
     this.workers.forEach(worker => {worker.work = 'unemployed';});
+    const index = this.gameScene.farms.indexOf(this);
+    this.gameScene.farms.splice(index, 1);
     this.destroy();
   }
 }
@@ -243,6 +245,8 @@ class Woodcutter extends Building {
   delete() {
     // lays off the workers
     this.workers.forEach(worker => {worker.work = 'unemployed';});
+    const index = this.gameScene.woodcutters.indexOf(this);
+    this.gameScene.woodcutters.splice(index, 1);
     this.destroy();
   }
 }

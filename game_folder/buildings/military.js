@@ -56,28 +56,33 @@ class Keep extends Building {
   }
   food() {
     this.gameScene.food -= Math.round(this.gameScene.population / 4);
+    let popup = this.gameScene.ui.popupHandler.popups.find(popup => popup.type == 'food');
 
     // add popup to tell player that they are about to lose
     if (this.gameScene.food < 0) {
-      let popup = this.gameScene.ui.popupHandler.popups.find(popup => popup.type == 'food');
       if (popup) {
         if (popup.domElement.node.children[5].children[1].children[0].value <= 0) {this.gameScene.endGame('food');}
         popup.domElement.node.children[5].children[1].children[0].value -= 10;
       } else {
         this.gameScene.ui.popupHandler.eventPopup('food');
       }
+    } else if (popup) {
+      if (popup.domElement.node.children[5].children[1].children[0].value < 90) {
+        popup.domElement.node.children[5].children[1].children[0].value += 10;
+      } else {
+        this.gameScene.ui.popupHandler.destroyPopup('food');
+      }
     }
   }
   checkPop() {
     let maxPop = this.gameScene.houses.length * 4;
     let pop = this.gameScene.population;
-    console.log('maxPop: ', maxPop, '\npop: ', pop)
+    let popup = this.gameScene.ui.popupHandler.popups.find(popup => popup.type == 'homeless');
     if (pop < maxPop - 10) {
       this.createNewPeople(10);
     } else if (pop < maxPop) {
       this.createNewPeople(maxPop - pop)
     } else if (pop > maxPop) {
-      let popup = this.gameScene.ui.popupHandler.popups.find(popup => popup.type == 'homeless');
       if (popup) {
         if (popup.domElement.node.children[5].children[1].children[0].value <= 0) {
           console.log('before: ', this.gameScene.unhoused.length)
@@ -88,6 +93,13 @@ class Keep extends Building {
       } else {
         console.log('bong')
         this.gameScene.ui.popupHandler.eventPopup('homeless');
+      }
+    }
+    if (popup && pop <= maxPop) {
+      if (popup.domElement.node.children[5].children[1].children[0].value < 90) {
+        popup.domElement.node.children[5].children[1].children[0].value += 10;
+      } else {
+        this.gameScene.ui.popupHandler.destroyPopup('homeless');
       }
     }
   }
@@ -148,6 +160,8 @@ class Tower extends Building {
     this.gameScene.stone += 75;
     this.gameScene.ui.popupHandler.plusOne('wood', '+25', this.x, this.y);
     this.gameScene.ui.popupHandler.plusOne('stone', '+75', this.x, this.y);
+    const index = this.gameScene.towers.indexOf(this);
+    this.gameScene.towers.splice(index, 1);
     this.destroy();
     // remove timeouts
   }
@@ -191,6 +205,8 @@ class Wall extends Building {
     // refund resources
     this.gameScene.stone += 50;
     this.gameScene.ui.popupHandler.plusOne('stone', '+50', this.x, this.y);
+    const index = this.gameScene.walls.indexOf(this);
+    this.gameScene.walls.splice(index, 1);
     this.destroy();
     // remove timeouts
   }

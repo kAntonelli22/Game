@@ -52,6 +52,8 @@ class House extends Building {
   }
   delete() {
     console.log('delete house')
+    const index = this.gameScene.houses.indexOf(this);
+    this.gameScene.houses.splice(index, 1);
     this.destroy();
     // remove timeouts
     // return tiles to original
