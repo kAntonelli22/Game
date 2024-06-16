@@ -20,7 +20,7 @@ class House extends Building {
     this.residents = [];
     this.foodStores = 0;
 
-    this.image.setTexture(`house${this.direction}`).setTint(0x00ff00);
+    this.image.setTexture('houseConstruction');
 
     this.add(this.image)
     this.scene.add.existing(this);
@@ -36,7 +36,7 @@ class House extends Building {
     } // code inside doesnt run when the building is being constructed
   }
   finishConstruction() {
-    this.image.setTexture(`house${this.direction}`).setTint(0xffffff);
+    this.image.setTexture(`house${this.direction}`);
     this.underConstruction = false;
   }
   // getFood() {
@@ -44,7 +44,7 @@ class House extends Building {
   //   this.foodStores++;
   // }
   getResident() {
-    let person = this.gameScene.houseless[0]
+    let person = this.gameScene.unhoused[0]
     if (person) {
       person.home = this;
       this.residents.push(person);

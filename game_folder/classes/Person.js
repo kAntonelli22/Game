@@ -90,8 +90,8 @@ class Person extends Phaser.GameObjects.Container {
   // }
   die() {
     console.log('person died');
-    this.hungerTimer.destroy();
-    this.happinessTimer.destroy();
+    // this.hungerTimer.destroy();
+    // this.happinessTimer.destroy();
     this.destroy();
   }
 }

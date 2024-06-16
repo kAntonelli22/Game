@@ -26,14 +26,21 @@ class Keep extends Building {
     this.add(this.image);
     this.scene.add.existing(this);
 
-    for (let i = 0; i < 10; i++) {
-      scene.people.add(new Person(scene, x, y));
-    }
+    // add starting settlers
+    this.createNewPeople(10);
 
     // basic food system timer
     this.gameScene.time.addEvent({
       delay: 2500,
       callback: this.food,
+      callbackScope: this,
+      loop: true,
+    })
+
+    // basic population system timer
+    this.gameScene.time.addEvent({
+      delay: 2500,
+      callback: this.checkPop,
       callbackScope: this,
       loop: true,
     })
@@ -54,12 +61,39 @@ class Keep extends Building {
     if (this.gameScene.food < 0) {
       let popup = this.gameScene.ui.popupHandler.popups.find(popup => popup.type == 'food');
       if (popup) {
-        if (popup.domElement.node.children[4].children[1].children[0].value <= 0) {this.gameScene.endGame('food');}
-        popup.domElement.node.children[4].children[1].children[0].value -= 10;
+        if (popup.domElement.node.children[5].children[1].children[0].value <= 0) {this.gameScene.endGame('food');}
+        popup.domElement.node.children[5].children[1].children[0].value -= 10;
       } else {
-        console.log('bong')
         this.gameScene.ui.popupHandler.eventPopup('food');
       }
+    }
+  }
+  checkPop() {
+    let maxPop = this.gameScene.houses.length * 4;
+    let pop = this.gameScene.population;
+    console.log('maxPop: ', maxPop, '\npop: ', pop)
+    if (pop < maxPop - 10) {
+      this.createNewPeople(10);
+    } else if (pop < maxPop) {
+      this.createNewPeople(maxPop - pop)
+    } else if (pop > maxPop) {
+      let popup = this.gameScene.ui.popupHandler.popups.find(popup => popup.type == 'homeless');
+      if (popup) {
+        if (popup.domElement.node.children[5].children[1].children[0].value <= 0) {
+          console.log('before: ', this.gameScene.unhoused.length)
+          this.gameScene.unhoused[0].die();
+          console.log('after: ', this.gameScene.unhoused.length)
+        }
+        popup.domElement.node.children[5].children[1].children[0].value -= 10;
+      } else {
+        console.log('bong')
+        this.gameScene.ui.popupHandler.eventPopup('homeless');
+      }
+    }
+  }
+  createNewPeople(number) {
+    for (let i = 0; i < number; i++) {
+      this.gameScene.people.add(new Person(this.gameScene, this.x, this.y));
     }
   }
   delete() {

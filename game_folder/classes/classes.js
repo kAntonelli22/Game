@@ -88,12 +88,17 @@ class popupContainer extends Phaser.GameObjects.Container {
 
   } // end of catalogPopup
   eventPopup(type) {
+    let domElement;
+    let container;
 
     switch(type) {
       case 'food':
-        const domElement = this.ui.add.dom(0, 100).createFromCache('foodWarning').setOrigin(0);
-
-        const container = {type: 'food', domElement: domElement};
+        domElement = this.ui.add.dom(0, 100).createFromCache('foodWarning').setOrigin(0);
+        container = {type: 'food', domElement: domElement};
+        this.popups.push(container);
+      case 'homeless':
+        domElement = this.ui.add.dom(0, 100).createFromCache('homelessWarning').setOrigin(0);
+        container = {type: 'homeless', domElement: domElement};
         this.popups.push(container);
     }
   }

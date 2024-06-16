@@ -24,6 +24,7 @@ class Boot extends Phaser.Scene {
     this.load.html('infoPopup', 'assets/html/infoPopup.html');
     this.load.html('eventPopup', 'assets/html/eventPopup.html');
     this.load.html('foodWarning', 'assets/html/foodWarning.html');
+    this.load.html('homelessWarning', 'assets/html/homelessWarning.html');
 
     // tile images
     //
@@ -32,6 +33,7 @@ class Boot extends Phaser.Scene {
     this.load.image('house1', 'assets/tiles/house1.png');
     this.load.image('house2', 'assets/tiles/house2.png');
     this.load.image('house3', 'assets/tiles/house3.png');
+    this.load.image('houseConstruction', 'assets/tiles/house_construction.png');
     this.load.image('bridge0', 'assets/tiles/bridge0.png');
     this.load.image('bridge1', 'assets/tiles/bridge1.png');
     // industry

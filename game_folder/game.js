@@ -150,7 +150,7 @@ class Game extends Phaser.Scene {
     this.employed = this.people.getChildren().filter(person => person.work !== 'unemployed');
     this.unemployed = this.people.getChildren().filter(person => person.work == 'unemployed');
     this.housed = this.people.getChildren().filter(person => person.home !== 'homeless');
-    this.houseless = this.people.getChildren().filter(person => person.home == 'homeless');
+    this.unhoused = this.people.getChildren().filter(person => person.home == 'homeless');
     
     this.population = this.people.getLength();
     // resources
@@ -240,7 +240,7 @@ class Game extends Phaser.Scene {
     this.employed = this.people.getChildren().filter(person => person.work !== 'unemployed');
     this.unemployed = this.people.getChildren().filter(person => person.work == 'unemployed');
     this.housed = this.people.getChildren().filter(person => person.home !== 'homeless');
-    this.houseless = this.people.getChildren().filter(person => person.home == 'homeless');
+    this.unhoused = this.people.getChildren().filter(person => person.home == 'homeless');
 
     // checks if q has been pressed and changes this.direction and updates the preview image
     if (Phaser.Input.Keyboard.JustDown(this.Q)) {
